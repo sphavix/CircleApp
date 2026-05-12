@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-string dbConnection = builder.Configuration.GetConnectionString("DefaultConnection")!;
+var dbConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<CircleAppDbContext>(options =>
     options.UseSqlServer(dbConnection));
 

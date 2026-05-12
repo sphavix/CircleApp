@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35825.156 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircleApp", "CircleApp\CircleApp.csproj", "{6053D48B-29A0-49D5-BC34-BB0865A57722}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CircleApp.Data", "CircleApp.Data\CircleApp.Data.csproj", "{8C0E5628-B37E-49CB-8377-C3BDB10268C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6053D48B-29A0-49D5-BC34-BB0865A57722}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6053D48B-29A0-49D5-BC34-BB0865A57722}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6053D48B-29A0-49D5-BC34-BB0865A57722}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C0E5628-B37E-49CB-8377-C3BDB10268C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C0E5628-B37E-49CB-8377-C3BDB10268C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C0E5628-B37E-49CB-8377-C3BDB10268C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C0E5628-B37E-49CB-8377-C3BDB10268C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
