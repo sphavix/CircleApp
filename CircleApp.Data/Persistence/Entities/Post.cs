@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CircleApp.Data.Persistence.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace CircleApp.Persistence.Entities
 {
@@ -11,5 +12,10 @@ namespace CircleApp.Persistence.Entities
         public int NumOfReports { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateUpdated { get; set; }
+
+        // Foreign key
+        public int UserId { get; set; }
+        // Navigation property
+        public User User { get; set; }
     }
 }
