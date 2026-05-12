@@ -1,3 +1,4 @@
+using CircleApp.Data.Helpers;
 using CircleApp.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,11 @@ builder.Services.AddDbContext<CircleAppDbContext>(options =>
     options.UseSqlServer(dbConnection));
 
 var app = builder.Build();
+
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<CircleAppDbContext>();
+await dbContext.Database.MigrateAsync();
+await DatabaseInitializer.SeedDataAsync(dbContext);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
