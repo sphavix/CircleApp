@@ -1,4 +1,5 @@
-﻿using CircleApp.Persistence.Entities;
+﻿using CircleApp.Data.Persistence.Entities;
+using CircleApp.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CircleApp.Persistence
@@ -10,5 +11,6 @@ namespace CircleApp.Persistence
         }
 
         public DbSet<Post> Posts { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
