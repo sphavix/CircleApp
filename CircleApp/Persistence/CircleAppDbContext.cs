@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CircleApp.Persistence.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CircleApp.Persistence
 {
@@ -7,5 +8,7 @@ namespace CircleApp.Persistence
         public CircleAppDbContext(DbContextOptions<CircleAppDbContext> options) : base(options)
         {
         }
+
+        public DbSet<Post> Posts { get; set; }
     }
 }
