@@ -41,6 +41,29 @@ public class HomeController : Controller
             ImageUrl = ""
         };
 
+        // check if an image was uploaded
+        if(post.Image != null && post.Image.Length > 0)
+        {
+            // save the image to wwwroot/images and get the URL
+            
+            var rootFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            if (post.Image.ContentType.Contains("image"))
+            {
+                string rootFolderPathImages = Path.Combine(rootFolderPath, "images");
+                Directory.CreateDirectory(rootFolderPathImages);
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(post.Image.FileName);
+                var filePath = Path.Combine(rootFolderPathImages, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await post.Image.CopyToAsync(stream);
+                }
+
+                // set the image URL to be used in the post
+                newPost.ImageUrl = "/images/" + fileName;
+            }
+        }
         await _context.Posts.AddAsync(newPost);
         await _context.SaveChangesAsync();
 
