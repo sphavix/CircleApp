@@ -1,7 +1,6 @@
-﻿using CircleApp.Data.Persistence.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace CircleApp.Persistence.Entities
+namespace CircleApp.Data.Persistence.Entities
 {
     public class Post
     {

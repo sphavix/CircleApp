@@ -1,6 +1,5 @@
 ﻿using CircleApp.Data.Persistence.Entities;
 using CircleApp.Persistence;
-using CircleApp.Persistence.Entities;
 namespace CircleApp.Data.Helpers
 {
     public static class DatabaseInitializer

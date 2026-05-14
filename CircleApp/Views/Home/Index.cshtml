@@ -1,4 +1,6 @@
-﻿﻿<main id="site__main" class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
+﻿@model List<Post>﻿
+
+<main id="site__main" class="2xl:ml-[--w-side]  xl:ml-[--w-side-sm] p-2.5 h-[calc(100vh-var(--m-top))] mt-[--m-top]">
     <div class="lg:flex 2xl:gap-16 gap-12 max-w-[1065px] mx-auto" id="js-oversized">
         <div class="max-w-[680px] mx-auto">
             @* stories *@
@@ -66,65 +68,73 @@
 
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm md:p-4 p-2 space-y-4 text-sm font-medium border1" style="width: 580px;">
-                    Currently, there are no posts available. Would you like to create the first one?
-                </div>
+                @if(Model.Count == 0)
+                {
+                    <div class="bg-white rounded-xl shadow-sm md:p-4 p-2 space-y-4 text-sm font-medium border1" style="width: 580px;">
+                        Currently, there are no posts available. Would you like to create the first one?
+                    </div>
+                }
 
-                <div class="bg-white rounded-xl shadow-sm text-sm font-medium border1">
+                @foreach (var post in Model)
+                {
+                    <div class="bg-white rounded-xl shadow-sm text-sm font-medium border1">
 
-                    @* Post heading *@
-                    <div class="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
-                        <a>
-                            <img src="~/images/avatar/user.png" class="w-9 h-9 rounded-full" />
-                        </a>
-                        <div class="flex-1">
+                        @* Post heading *@
+                        <div class="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
                             <a>
-                                <h4 class="text-black">Ervis Trupja</h4>
-                                <div class="text-xs text-gray-500/80">1 day ago</div>
+                                <img src="@(string.IsNullOrEmpty(post.User.ProfilePictureUrl) ? "~/images/avatar/user.png" : post.User.ProfilePictureUrl)" class="w-9 h-9 rounded-full" />
                             </a>
-                        </div>
+                            <div class="flex-1">
+                                <a>
+                                    <h4 class="text-black">@post.User.FullName</h4>
+                                    <div class="text-xs text-gray-500/80">@post.DateCreated.ToString("dd/MM/yyyy HH:mm")</div>
+                                </a>
+                            </div>
 
-                        <div class="-mr-1">
-                            <button type="button" class="button-icon w-8 h-8"> <ion-icon class="text-xl" name="ellipsis-horizontal"></ion-icon> </button>
-                            <div class="w-[245px]" uk-dropdown="pos: bottom-right; animation: uk-animation-scale-up uk-transform-origin-top-right; animate-out: true; mode: click">
-                                <form>
-                                    <input type="hidden" name="postId" />
-                                    <button type="submit" class="hover:!bg-red-50 icon-link">
-                                        <ion-icon name="lock-closed-outline"></ion-icon>  Set as private
-                                    </button>
-                                </form>
+                            <div class="-mr-1">
+                                <button type="button" class="button-icon w-8 h-8"> <ion-icon class="text-xl" name="ellipsis-horizontal"></ion-icon> </button>
+                                <div class="w-[245px]" uk-dropdown="pos: bottom-right; animation: uk-animation-scale-up uk-transform-origin-top-right; animate-out: true; mode: click">
+                                    <form>
+                                        <input type="hidden" name="postId" />
+                                        <button type="submit" class="hover:!bg-red-50 icon-link">
+                                            <ion-icon name="lock-closed-outline"></ion-icon>  Set as private
+                                        </button>
+                                    </form>
 
-                                <hr>
-                                <form asp-controller="Home" asp-action="Delete">
-                                    <input type="hidden" name="postId" />
-                                    <button type="submit" class="text-red-400 hover:!bg-red-50 icon-link">
-                                        <ion-icon name="trash-bin-outline"></ion-icon>  Delete Post
-                                    </button>
-                                </form>
-                                <form asp-controller="Home" asp-action="Report">
-                                    <input type="hidden" name="postId" />
-                                    <button type="submit" class="hover:!bg-red-50 icon-link">
-                                        <ion-icon class="text-xl shrink-0" name="flag-outline"></ion-icon>  Report
-                                    </button>
-                                </form>
+                                    <hr>
+                                    <form asp-controller="Home" asp-action="Delete">
+                                        <input type="hidden" name="postId" />
+                                        <button type="submit" class="text-red-400 hover:!bg-red-50 icon-link">
+                                            <ion-icon name="trash-bin-outline"></ion-icon>  Delete Post
+                                        </button>
+                                    </form>
+                                    <form asp-controller="Home" asp-action="Report">
+                                        <input type="hidden" name="postId" />
+                                        <button type="submit" class="hover:!bg-red-50 icon-link">
+                                            <ion-icon class="text-xl shrink-0" name="flag-outline"></ion-icon>  Report
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
                     @* Post content *@
                     <a>
                         <div class="sm:px-4 p-2.5 pt-0 w-full">
                             <p class="font-normal">
-                                This is our first status from the #circleapp where you can share text or pictures with your friends and family...
+                                @post.Content
                             </p>
                         </div>
                     </a>
 
-                    <a>
-                        <div class="relative w-full lg:h-96 h-full sm:px-4">
-                            <img src="~/images/placeholders/post-placeholder.jpg" class="sm:rounded-lg w-full h-full object-cover" />
-                        </div>
-                    </a>
+                    @if(!string.IsNullOrEmpty(post.ImageUrl))
+                    {
+                        <a>
+                            <div class="relative w-full lg:h-96 h-full sm:px-4">
+                                <img src="@post.ImageUrl" class="sm:rounded-lg w-full h-full object-cover" />
+                            </div>
+                        </a>
+                    }
 
                     @* Icons *@
                     <div class="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
@@ -167,7 +177,7 @@
                     </div>
 
                 </div>
-
+                }
 
             </div>
 

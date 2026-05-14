@@ -1,6 +1,4 @@
 ﻿
-using CircleApp.Persistence.Entities;
-
 namespace CircleApp.Data.Persistence.Entities
 {
     public class User
