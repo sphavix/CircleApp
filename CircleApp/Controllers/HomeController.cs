@@ -2,6 +2,8 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using CircleApp.Persistence;
 using Microsoft.EntityFrameworkCore;
+using CircleApp.Data.Persistence.Entities;
+using CircleApp.Models;
 
 namespace CircleApp.Controllers;
 
@@ -22,5 +24,26 @@ public class HomeController : Controller
         return View(posts);
     }
 
-    
+    [HttpPost]
+    public async Task<IActionResult> CreatePost(PostViewModel post)
+    {
+        // Get the current user (for simplicity, we assume a user with ID 1)
+        int loggedInUserId = 1;
+        var newPost = new Post
+        {
+            Content = post.Content,
+            UserId = loggedInUserId,
+            DateCreated = DateTime.UtcNow,
+            DateUpdated = DateTime.UtcNow,
+            NumOfReports = 0,
+            ImageUrl = ""
+        };
+
+        await _context.Posts.AddAsync(newPost);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
+
+
 }
