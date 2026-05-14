@@ -1,5 +1,18 @@
 ﻿@model Post
 
+@{
+    TimeSpan timeSpanSincePosted = DateTime.UtcNow.Subtract(Model.DateCreated);
+
+    string displayTime = timeSpanSincePosted switch
+    {
+        { TotalDays: >= 1 } => $"{timeSpanSincePosted.Days}d ago",
+        { TotalHours: >= 1 } => $"{timeSpanSincePosted.Hours}h ago",
+        { TotalMinutes: >= 1 } => $"{timeSpanSincePosted.Minutes}m ago",
+        _ => "Just now"
+    };
+   
+}
+
 <div class="bg-white rounded-xl shadow-sm text-sm font-medium border1">
 
     @* Post heading *@
@@ -10,7 +23,7 @@
         <div class="flex-1">
             <a>
                 <h4 class="text-black">@Model.User.FullName</h4>
-                <div class="text-xs text-gray-500/80">@Model.DateCreated.ToString("dd/MM/yyyy HH:mm")</div>
+                <div class="text-xs text-gray-500/80" title="@Model.DateUpdated.ToString("dd/MM/yyyy HH:mm")">@displayTime</div>
             </a>
         </div>
 
