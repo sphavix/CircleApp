@@ -99,5 +99,22 @@ public class HomeController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    public async Task<IActionResult> AddPostComment(PostCommentViewModel model)
+    {
+        int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
+        // Create a new comment entity and save it to the database
+        var newComment = new Comment
+        {
+            Content = model.Comment,
+            UserId = loggedInUserId,
+            PostId = model.PostId,
+            DateCreated = DateTime.UtcNow,
+            DateUpdated = DateTime.UtcNow
+        };
+        await _context.Comments.AddAsync(newComment);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
 }
