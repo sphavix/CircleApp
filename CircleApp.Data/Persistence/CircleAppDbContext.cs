@@ -12,6 +12,7 @@ namespace CircleApp.Persistence
         public DbSet<Post> Posts { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Like> Likes { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +23,8 @@ namespace CircleApp.Persistence
                 .WithOne(p => p.User)
                 .HasForeignKey(p => p.UserId);
 
+
+            // Configure the relationship between Post, User and Like
             modelBuilder.Entity<Like>()
                 .HasKey(l => new { l.PostId, l.UserId });
 
@@ -37,6 +40,18 @@ namespace CircleApp.Persistence
                 .HasForeignKey(l => l.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Configure the relationship between Post, User and Comment
+            modelBuilder.Entity<Comment>()
+                .HasOne(l => l.Post)
+                .WithMany(p => p.Comments)
+                .HasForeignKey(l => l.PostId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(l => l.User)
+                .WithMany(u => u.Comments)
+                .HasForeignKey(l => l.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
             
