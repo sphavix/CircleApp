@@ -107,7 +107,7 @@ public class HomeController : Controller
         // Create a new comment entity and save it to the database
         var newComment = new Comment
         {
-            Content = model.Comment,
+            Content = model.Content,
             UserId = loggedInUserId,
             PostId = model.PostId,
             DateCreated = DateTime.UtcNow,
