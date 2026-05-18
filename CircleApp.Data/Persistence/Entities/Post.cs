@@ -16,5 +16,6 @@ namespace CircleApp.Data.Persistence.Entities
         public int UserId { get; set; }
         // Navigation property
         public User User { get; set; }
+        public ICollection<Like> Likes { get; set; } = new List<Like>();
     }
 }

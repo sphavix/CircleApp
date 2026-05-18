@@ -22,27 +22,25 @@ namespace CircleApp.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.User", b =>
+            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.Like", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ProfilePictureUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("PostId", "UserId");
 
-                    b.HasKey("Id");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Likes");
                 });
 
-            modelBuilder.Entity("CircleApp.Persistence.Entities.Post", b =>
+            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,7 +74,46 @@ namespace CircleApp.Data.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("CircleApp.Persistence.Entities.Post", b =>
+            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.Like", b =>
+                {
+                    b.HasOne("CircleApp.Data.Persistence.Entities.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CircleApp.Data.Persistence.Entities.User", "User")
+                        .WithMany("Likes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.Post", b =>
                 {
                     b.HasOne("CircleApp.Data.Persistence.Entities.User", "User")
                         .WithMany("Posts")
@@ -87,8 +124,15 @@ namespace CircleApp.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.Post", b =>
+                {
+                    b.Navigation("Likes");
+                });
+
             modelBuilder.Entity("CircleApp.Data.Persistence.Entities.User", b =>
                 {
+                    b.Navigation("Likes");
+
                     b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
