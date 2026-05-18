@@ -21,6 +21,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         var posts = await _context.Posts.Include(u => u.User)
+                                        .Include(p => p.Likes)
                                         .OrderByDescending(n => n.DateCreated)
                                         .ToListAsync();
         return View(posts);
