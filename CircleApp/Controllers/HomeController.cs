@@ -70,5 +70,33 @@ public class HomeController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    public async Task<IActionResult> TogglePostLike(LikePostViewModel model)
+    {
+        int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
+
+        // Check if the like already exists for the given post and user
+        var existingLike = await _context.Likes
+                                        .Where(l => l.PostId == model.PostId && l.UserId == loggedInUserId)
+                                        .FirstOrDefaultAsync();
+        if (existingLike != null)
+        {
+            // If the like already exists, remove it (unlike)
+            _context.Likes.Remove(existingLike);
+        }
+        else
+        {
+            // If the like does not exist, add it (like)
+            var newLike = new Like
+            {
+                PostId = model.PostId,
+                UserId = loggedInUserId
+            };
+            await _context.Likes.AddAsync(newLike);
+        }
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+
 
 }
