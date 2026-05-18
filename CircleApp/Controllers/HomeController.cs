@@ -119,4 +119,18 @@ public class HomeController : Controller
         await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost]
+    public async Task<IActionResult> RemovePostComment(RemoveCommentViewModel model)
+    {
+        // Find the comment to be removed
+        var commentToRemove = await _context.Comments
+                                            .FirstOrDefaultAsync(c => c.Id == model.CommentId);
+        if (commentToRemove != null)
+        {
+            _context.Comments.Remove(commentToRemove);
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Index));
+    }
 }
