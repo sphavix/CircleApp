@@ -90,7 +90,7 @@
             <a class="button-icon">
                 <ion-icon class="text-lg" name="chatbubble-ellipses-outline"></ion-icon>
             </a>
-            <a href="#">5</a>
+            <a href="#">@Model.Comments.Count</a>
         </div>
 
         <div class="ml-auto"></div>
@@ -104,6 +104,38 @@
 
     @* Add comment section *@
     <div>
+        <div class="p-2.5 border-t border-gray-100 font-normal space-y-3 relative">
+            @foreach(var comment in Model.Comments)
+            {
+                TimeSpan commentTimeSpanSincePosted = DateTime.UtcNow.Subtract(comment.DateCreated);
+
+                string commentDisplayTime = commentTimeSpanSincePosted switch
+                {
+                    { TotalDays: >= 1 } => $"{commentTimeSpanSincePosted.Days}d ago",
+                    { TotalHours: >= 1 } => $"{commentTimeSpanSincePosted.Hours}h ago",
+                    { TotalMinutes: >= 1 } => $"{commentTimeSpanSincePosted.Minutes}m ago",
+                    _ => "Just now"
+                };
+
+                <div class="flex items-start gap-3 relative">
+                    <a>
+                        <img src="@(string.IsNullOrEmpty(comment.User.ProfilePictureUrl) ? "~/images/avatar/user.png" : Model.User.ProfilePictureUrl)"
+                             class="w-6 h-6 mt-1 rounded-full" />
+                    </a>
+                    <div class="flex-1">
+                        <div class="flex justify-content-between">
+                            <a class="text-black font-medium inline-block flex-grow">
+                                @comment.User.FullName
+                            </a>
+                            <small>@commentDisplayTime</small>
+                        </div>
+                        <p class="mt-0.5">
+                            @comment.Content
+                        </p>
+                    </div>
+                </div>
+            }
+        </div>
         <form asp-controller="Home" asp-action="AddPostComment">
             <div class="sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 flex items-center gap-1">
                 <img src="~/images/avatar/user.png" class="w-6 h-6 rounded-full" />
