@@ -105,7 +105,7 @@
     @* Add comment section *@
     <div>
         <div class="p-2.5 border-t border-gray-100 font-normal space-y-3 relative">
-            @foreach(var comment in Model.Comments)
+            @foreach(var comment in Model.Comments.OrderByDescending(c => c.DateCreated).Take(3))
             {
                 TimeSpan commentTimeSpanSincePosted = DateTime.UtcNow.Subtract(comment.DateCreated);
 
@@ -133,6 +133,13 @@
                             @comment.Content
                         </p>
                     </div>
+                </div>
+            }
+
+            @if(Model.Comments.Count >= 3)
+            {
+                <div class="p-1.5">
+                    <a href="#" class="text-xs text-gray-500/80">Show all comments</a>
                 </div>
             }
         </div>
