@@ -102,6 +102,34 @@ public class HomeController : Controller
     }
 
     [HttpPost]
+    public async Task<IActionResult> TogglePostFavourite(FavouritePostViewModel model)
+    {
+        int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
+
+        // Check if the like already exists for the given post and user
+        var existingFavourite = await _context.Favourites
+                                        .Where(l => l.PostId == model.PostId && l.UserId == loggedInUserId)
+                                        .FirstOrDefaultAsync();
+        if (existingFavourite != null)
+        {
+            // If the like already exists, remove it (unlike)
+            _context.Favourites.Remove(existingFavourite);
+        }
+        else
+        {
+            // If the like does not exist, add it (like)
+            var newFavourite = new Favourite
+            {
+                PostId = model.PostId,
+                UserId = loggedInUserId
+            };
+            await _context.Favourites.AddAsync(newFavourite);
+        }
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
     public async Task<IActionResult> AddPostComment(PostCommentViewModel model)
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
@@ -133,4 +161,6 @@ public class HomeController : Controller
         }
         return RedirectToAction(nameof(Index));
     }
+
+
 }
