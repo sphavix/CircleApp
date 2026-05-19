@@ -131,6 +131,25 @@ public class HomeController : Controller
     }
 
     [HttpPost]
+    public async Task<IActionResult> TogglePostVisibility(PostVisibilityViewModel model)
+    {
+        int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
+
+        // Check if the like already exists for the given post and user
+        var post = await _context.Posts
+                                        .FirstOrDefaultAsync(l => l.Id == model.PostId && l.UserId == loggedInUserId);
+        if (post != null)
+        {
+            // toggle post
+            post.isPrivate = !post.isPrivate;
+            _context.Posts.Update(post);
+            await _context.SaveChangesAsync();
+        }
+        
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
     public async Task<IActionResult> AddPostComment(PostCommentViewModel model)
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1

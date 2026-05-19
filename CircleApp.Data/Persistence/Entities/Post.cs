@@ -11,6 +11,7 @@ namespace CircleApp.Data.Persistence.Entities
         public int NumOfReports { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateUpdated { get; set; }
+        public bool isPrivate { get; set; }
 
         // Foreign key
         public int UserId { get; set; }
