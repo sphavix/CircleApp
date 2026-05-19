@@ -22,6 +22,7 @@ public class HomeController : Controller
     {
         var posts = await _context.Posts.Include(u => u.User)
                                         .Include(p => p.Likes)
+                                        .Include(f => f.Favourites)
                                         .Include(p => p.Comments)
                                             .ThenInclude(c => c.User)
                                         .OrderByDescending(n => n.DateCreated)
