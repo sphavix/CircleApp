@@ -20,7 +20,9 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var posts = await _context.Posts.Include(u => u.User)
+        int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
+        var posts = await _context.Posts.Where(x => !x.isPrivate/* || x.UserId == loggedInUserId*/)
+                                        .Include(u => u.User)
                                         .Include(p => p.Likes)
                                         .Include(f => f.Favourites)
                                         .Include(p => p.Comments)
