@@ -21,13 +21,13 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
-        var posts = await _context.Posts.Where(x => !x.isPrivate/* || x.UserId == loggedInUserId*/)
+        var posts = await _context.Posts.Where(x => (!x.isPrivate || x.UserId == loggedInUserId) && x.Reports.Count < 5)
                                         .Include(u => u.User)
                                         .Include(p => p.Likes)
                                         .Include(f => f.Favourites)
                                         .Include(r => r.Reports)
                                         .Include(p => p.Comments)
-                                            .ThenInclude(c => c.User)
+                                        .ThenInclude(c => c.User)
                                         .OrderByDescending(n => n.DateCreated)
                                         .ToListAsync();
         return View(posts);
