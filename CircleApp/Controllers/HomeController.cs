@@ -25,6 +25,7 @@ public class HomeController : Controller
                                         .Include(u => u.User)
                                         .Include(p => p.Likes)
                                         .Include(f => f.Favourites)
+                                        .Include(r => r.Reports)
                                         .Include(p => p.Comments)
                                             .ThenInclude(c => c.User)
                                         .OrderByDescending(n => n.DateCreated)
