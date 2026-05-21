@@ -189,14 +189,3 @@
 
 </div>
 
-<partial name="Home/_DeleteConfirmation" />
-
-<script>
-        function openPostDeleteConfirmation(postId) {
-        console.log("Opening delete confirmation for post ID:", postId);
-        UIkit.dropdown('.post-options-dropdown').hide(); // Hide the dropdown
-
-        document.getElementById('postId').value = postId;
-       
-        UIkit.modal('#postDeleteDialog').show();
-}</script>

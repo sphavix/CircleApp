@@ -202,5 +202,19 @@ public class HomeController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    public async Task<IActionResult> DeletePost(DeletePostViewModel model)
+    {
+        // Find the comment to be removed
+        var post = await _context.Posts.FirstOrDefaultAsync(c => c.Id == model.PostId);
+
+        if (post != null)
+        {
+            _context.Posts.Remove(post);
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
 
 }
