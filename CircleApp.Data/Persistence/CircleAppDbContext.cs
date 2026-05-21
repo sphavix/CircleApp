@@ -14,6 +14,7 @@ namespace CircleApp.Persistence
         public DbSet<Like> Likes { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Favourite> Favourites { get; set; }
+        public DbSet<Report> Reports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +69,22 @@ namespace CircleApp.Persistence
                 .HasOne(f => f.User)
                 .WithMany(u => u.Favourites)
                 .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure the relationship between Post, User and Report
+            modelBuilder.Entity<Report>()
+               .HasKey(f => new { f.PostId, f.UserId });
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.Post)
+                .WithMany(p => p.Reports)
+                .HasForeignKey(r => r.PostId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Report>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.Reports)
+                .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 
