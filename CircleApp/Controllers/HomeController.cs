@@ -171,6 +171,23 @@ public class HomeController : Controller
     }
 
     [HttpPost]
+    public async Task<IActionResult> AddPostReport(PostReportViewModel model)
+    {
+        int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
+
+        // Create a new comment entity and save it to the database
+        var newReport = new Report
+        {
+            UserId = loggedInUserId,
+            PostId = model.PostId,
+            DateCreated = DateTime.UtcNow
+        };
+        await _context.Reports.AddAsync(newReport);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
     public async Task<IActionResult> RemovePostComment(RemoveCommentViewModel model)
     {
         // Find the comment to be removed
