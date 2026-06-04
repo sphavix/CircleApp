@@ -2,6 +2,7 @@
 using CircleApp.Models;
 using CircleApp.Persistence;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 
 namespace CircleApp.Controllers
@@ -16,9 +17,10 @@ namespace CircleApp.Controllers
             _logger = logger;
             _context = context;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var stories = await _context.Stories.Include(u => u.User).ToListAsync();
+            return View(stories);
         }
 
         [HttpPost]
