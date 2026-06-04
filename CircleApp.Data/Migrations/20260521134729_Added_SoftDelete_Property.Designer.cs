@@ -4,6 +4,7 @@ using CircleApp.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CircleApp.Data.Migrations
 {
     [DbContext(typeof(CircleAppDbContext))]
-    partial class CircleAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260521134729_Added_SoftDelete_Property")]
+    partial class Added_SoftDelete_Property
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,33 +158,6 @@ namespace CircleApp.Data.Migrations
                     b.ToTable("Reports");
                 });
 
-            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.Story", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("isDeleted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Stories");
-                });
-
             modelBuilder.Entity("CircleApp.Data.Persistence.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -292,17 +268,6 @@ namespace CircleApp.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CircleApp.Data.Persistence.Entities.Story", b =>
-                {
-                    b.HasOne("CircleApp.Data.Persistence.Entities.User", "User")
-                        .WithMany("Stories")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("CircleApp.Data.Persistence.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
@@ -325,8 +290,6 @@ namespace CircleApp.Data.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("Reports");
-
-                    b.Navigation("Stories");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,6 +12,7 @@ namespace CircleApp.Data.Persistence.Entities
         public DateTime DateCreated { get; set; }
         public DateTime DateUpdated { get; set; }
         public bool isPrivate { get; set; }
+        public bool isDeleted { get; set; }
 
         // Foreign key
         public int UserId { get; set; }

@@ -21,7 +21,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
-        var posts = await _context.Posts.Where(x => (!x.isPrivate || x.UserId == loggedInUserId) && x.Reports.Count < 5)
+        var posts = await _context.Posts.Where(x => (!x.isPrivate || x.UserId == loggedInUserId) && x.Reports.Count < 5 && !x.isDeleted)
                                         .Include(u => u.User)
                                         .Include(p => p.Likes)
                                         .Include(f => f.Favourites)
@@ -210,7 +210,8 @@ public class HomeController : Controller
 
         if (post != null)
         {
-            _context.Posts.Remove(post);
+            post.isDeleted = true;
+            _context.Posts.Update(post);
             await _context.SaveChangesAsync();
         }
         return RedirectToAction(nameof(Index));
