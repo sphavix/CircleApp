@@ -56,7 +56,7 @@ public class HomeController : Controller
             var rootFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             if (post.Image.ContentType.Contains("image"))
             {
-                string rootFolderPathImages = Path.Combine(rootFolderPath, "images/uploaded");
+                string rootFolderPathImages = Path.Combine(rootFolderPath, "images/posts");
                 Directory.CreateDirectory(rootFolderPathImages);
 
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(post.Image.FileName);
@@ -68,7 +68,7 @@ public class HomeController : Controller
                 }
 
                 // set the image URL to be used in the post
-                newPost.ImageUrl = "/images/uploaded/" + fileName;
+                newPost.ImageUrl = "/images/posts/" + fileName;
             }
         }
         await _context.Posts.AddAsync(newPost);
