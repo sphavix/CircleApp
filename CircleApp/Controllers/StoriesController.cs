@@ -55,7 +55,7 @@ namespace CircleApp.Controllers
                     }
 
                     // set the image URL to be used in the post
-                    newStory.ImageUrl = "/images/uploaded/" + fileName;
+                    newStory.ImageUrl = "/images/stories/" + fileName;
                 }
             }
             await _context.Stories.AddAsync(newStory);
