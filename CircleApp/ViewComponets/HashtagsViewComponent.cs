@@ -13,7 +13,10 @@ namespace CircleApp.ViewComponets
         }
         public async Task<IViewComponentResult> InvokeAsync()
         {
+            var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
+
             var hashtags = await _context.Hashtags
+                .Where(c => c.DateCreated >= oneWeekAgo)
                 .OrderByDescending(h => h.Count)
                 .Take(10)
                 .ToListAsync();
