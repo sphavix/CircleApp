@@ -227,9 +227,14 @@ public class HomeController : Controller
                                             .FirstOrDefaultAsync(c => c.Id == model.CommentId);
         if (commentToRemove != null)
         {
+
             _context.Comments.Remove(commentToRemove);
             await _context.SaveChangesAsync();
+
+
+           
         }
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -244,6 +249,21 @@ public class HomeController : Controller
             post.isDeleted = true;
             _context.Posts.Update(post);
             await _context.SaveChangesAsync();
+
+            // update hashtags in the database
+            var hashTag = HashtagHelper.ExtractHashtags(post.Content);
+            foreach(var hashtag in hashTag)
+            {
+                var existingHashtag = await _context.Hashtags.FirstOrDefaultAsync(h => h.Name == hashtag);
+                if (existingHashtag != null)
+                {
+                    existingHashtag.Count--;
+                    existingHashtag.DateUpdated = DateTime.UtcNow;
+
+                    _context.Hashtags.Update(existingHashtag);
+                    await _context.SaveChangesAsync();
+                }
+            }
         }
         return RedirectToAction(nameof(Index));
     }
