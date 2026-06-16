@@ -15,7 +15,9 @@ namespace CircleApp.ViewComponets
         }
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var stories = await _context.Stories.Include(u => u.User).ToListAsync();
+            var stories = await _context.Stories
+                .Where(c => c.DateCreated >= DateTime.UtcNow.AddHours(-24))
+                .Include(u => u.User).ToListAsync();
             return View(stories);
         }
     }
