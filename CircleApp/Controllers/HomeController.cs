@@ -4,6 +4,7 @@ using CircleApp.Persistence;
 using Microsoft.EntityFrameworkCore;
 using CircleApp.Data.Persistence.Entities;
 using CircleApp.Models;
+using CircleApp.Data.Helpers;
 
 namespace CircleApp.Controllers;
 
@@ -71,8 +72,38 @@ public class HomeController : Controller
                 newPost.ImageUrl = "/images/posts/" + fileName;
             }
         }
+
+        // Save the new post to the database
         await _context.Posts.AddAsync(newPost);
         await _context.SaveChangesAsync();
+
+        // Find and store hashtags in the database
+        var postHastags = HashtagHelper.ExtractHashtags(post.Content);
+        foreach(var hashtag in postHastags)
+        {
+            var existingHashtag = await _context.Hashtags.FirstOrDefaultAsync(h => h.Name == hashtag);
+            if (existingHashtag != null)
+            {
+                existingHashtag.Count++;
+                existingHashtag.DateUpdated = DateTime.UtcNow;
+
+                _context.Hashtags.Update(existingHashtag);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                var newHashtag = new Hashtag
+                {
+                    Name = hashtag,
+                    Count = 1,
+                    DateCreated = DateTime.UtcNow,
+                    DateUpdated = DateTime.UtcNow
+                };
+
+                await _context.Hashtags.AddAsync(newHashtag);
+                await _context.SaveChangesAsync();
+            }
+        }
 
         return RedirectToAction(nameof(Index));
     }

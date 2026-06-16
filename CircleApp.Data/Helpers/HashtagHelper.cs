@@ -13,7 +13,7 @@ namespace CircleApp.Data.Helpers
         {
             var hashTagsPattern = new Regex(@"#\w+");
             var matches = hashTagsPattern.Matches(content)
-                            .Select(m => m.Value.TrimEnd('.', ',', '!', '?'))
+                            .Select(m => m.Value.TrimEnd('.', ',', '!', '?').Replace(".", "").ToLower())
                             .Distinct()
                             .ToList();
             return matches;
