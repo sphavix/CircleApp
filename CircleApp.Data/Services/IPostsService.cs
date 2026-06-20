@@ -8,7 +8,7 @@ namespace CircleApp.Data.Services
     {
         Task<List<Post>> GetPostsForUserAsync(int userId);
         Task<Post> GetPostByIdAsync(int postId);
-        Task CreatePostAsync(Post post, IFormFile Image);
+        Task<Post> CreatePostAsync(Post post, IFormFile Image);
         Task DeletePostAsync(int postId);
 
         Task AddPostCommentAsync(Comment comment);

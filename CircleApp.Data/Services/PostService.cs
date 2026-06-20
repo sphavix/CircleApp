@@ -2,6 +2,7 @@
 using CircleApp.Data.Persistence.Entities;
 using CircleApp.Persistence;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace CircleApp.Data.Services
 {
@@ -9,54 +10,171 @@ namespace CircleApp.Data.Services
     {
         private readonly CircleAppDbContext _context = context;
 
-        public Task AddPostCommentAsync(Comment comment)
+        public async Task<List<Post>> GetPostsForUserAsync(int userId)
         {
-            throw new NotImplementedException();
+            int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
+            var posts = await _context.Posts.Where(x => (!x.isPrivate || x.UserId == loggedInUserId) && x.Reports.Count < 5 && !x.isDeleted)
+                                            .Include(u => u.User)
+                                            .Include(p => p.Likes)
+                                            .Include(f => f.Favourites)
+                                            .Include(r => r.Reports)
+                                            .Include(p => p.Comments)
+                                            .ThenInclude(c => c.User)
+                                            .OrderByDescending(n => n.DateCreated)
+                                            .ToListAsync();
+            return posts;
         }
 
-        public Task CreatePostAsync(Post post, IFormFile Image)
+        public async Task<Post> CreatePostAsync(Post post, IFormFile Image)
         {
-            throw new NotImplementedException();
+            // check if an image was uploaded
+            if (Image != null && Image.Length > 0)
+            {
+                // save the image to wwwroot/images and get the URL
+
+                var rootFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                if (Image.ContentType.Contains("image"))
+                {
+                    string rootFolderPathImages = Path.Combine(rootFolderPath, "images/posts");
+                    Directory.CreateDirectory(rootFolderPathImages);
+
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
+                    var filePath = Path.Combine(rootFolderPathImages, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await Image.CopyToAsync(stream);
+                    }
+
+                    // set the image URL to be used in the post
+                    post.ImageUrl = "/images/posts/" + fileName;
+                }
+            }
+
+            // Save the new post to the database
+            await _context.Posts.AddAsync(post);
+            await _context.SaveChangesAsync();
+
+            return post;
         }
 
-        public Task DeletePostAsync(int postId)
+        public async Task DeletePostAsync(int postId)
         {
-            throw new NotImplementedException();
+            var post = await _context.Posts.FirstOrDefaultAsync(x => x.Id == postId);
+            if (post != null)
+            {
+                post.isDeleted = true;
+                _context.Posts.Update(post);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public Task<Post> GetPostByIdAsync(int postId)
+        public async Task<Post> GetPostByIdAsync(int postId)
         {
-            throw new NotImplementedException();
+            var post = await _context.Posts
+                .Include(u => u.User)
+                .Include(p => p.Likes)
+                .Include(f => f.Favourites)
+                .Include(r => r.Reports)
+                .Include(p => p.Comments)
+                .ThenInclude(c => c.User)
+                .FirstOrDefaultAsync(x => x.Id == postId);
+            if (post == null)
+            {
+                throw new ArgumentNullException($"Post with ID {postId} not found.");
+            }
+            return post;
         }
 
-        public Task<List<Post>> GetPostsForUserAsync(int userId)
+
+        public async Task AddPostCommentAsync(Comment comment)
         {
-            throw new NotImplementedException();
+            await _context.Comments.AddAsync(comment);
+            await _context.SaveChangesAsync();
         }
 
-        public Task RemovePostCommentAsync(int commentId)
+        public async Task RemovePostCommentAsync(int commentId)
         {
-            throw new NotImplementedException();
+           var comment = _context.Comments.FirstOrDefault(x => x.Id == commentId);
+            if (comment != null)
+            {
+                _context.Comments.Remove(comment);
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public Task ReportPostAsync(int postId, int userId)
+        public async Task ReportPostAsync(int postId, int userId)
         {
-            throw new NotImplementedException();
+            // Create a new comment entity and save it to the database
+            var newReport = new Report
+            {
+                UserId = userId,
+                PostId = postId,
+                DateCreated = DateTime.UtcNow
+            };
+            await _context.Reports.AddAsync(newReport);
+            await _context.SaveChangesAsync();
         }
 
-        public Task TogglePostFavouriteAsync(int postId, int userId)
+        public async Task TogglePostFavouriteAsync(int postId, int userId)
         {
-            throw new NotImplementedException();
+            // Check if the like already exists for the given post and user
+            var existingFavourite = await _context.Favourites
+                                            .Where(l => l.PostId == postId && l.UserId == userId)
+                                            .FirstOrDefaultAsync();
+            if (existingFavourite != null)
+            {
+                // If the like already exists, remove it (unlike)
+                _context.Favourites.Remove(existingFavourite);
+            }
+            else
+            {
+                // If the like does not exist, add it (like)
+                var newFavourite = new Favourite
+                {
+                    PostId = postId,
+                    UserId = userId
+                };
+                await _context.Favourites.AddAsync(newFavourite);
+            }
+            await _context.SaveChangesAsync();
         }
 
-        public Task TogglePostLikeAsync(int postId, int userId)
+        public async Task TogglePostLikeAsync(int postId, int userId)
         {
-            throw new NotImplementedException();
+            // Check if the like already exists for the given post and user
+            var existingLike = await _context.Likes
+                                            .Where(l => l.PostId == postId && l.UserId == userId)
+                                            .FirstOrDefaultAsync();
+            if (existingLike != null)
+            {
+                // If the like already exists, remove it (unlike)
+                _context.Likes.Remove(existingLike);
+            }
+            else
+            {
+                // If the like does not exist, add it (like)
+                var newLike = new Like
+                {
+                    PostId = postId,
+                    UserId = userId
+                };
+                await _context.Likes.AddAsync(newLike);
+            }
+            await _context.SaveChangesAsync();
         }
 
-        public Task ToggleVisibilityAsync(int postId, int userId)
+        public async Task ToggleVisibilityAsync(int postId, int userId)
         {
-            throw new NotImplementedException();
+            // Check if the like already exists for the given post and user
+            var post = await _context.Posts.FirstOrDefaultAsync(l => l.Id == postId && l.UserId == userId);
+            if (post != null)
+            {
+                // toggle post
+                post.isPrivate = !post.isPrivate;
+                _context.Posts.Update(post);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -21,17 +21,8 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
-        var posts = await _context.Posts.Where(x => (!x.isPrivate || x.UserId == loggedInUserId) && x.Reports.Count < 5 && !x.isDeleted)
-                                        .Include(u => u.User)
-                                        .Include(p => p.Likes)
-                                        .Include(f => f.Favourites)
-                                        .Include(r => r.Reports)
-                                        .Include(p => p.Comments)
-                                        .ThenInclude(c => c.User)
-                                        .OrderByDescending(n => n.DateCreated)
-                                        .ToListAsync();
-        return View(posts);
+        
+        return View();
     }
 
     [HttpPost]
@@ -49,33 +40,9 @@ public class HomeController : Controller
             ImageUrl = ""
         };
 
-        // check if an image was uploaded
-        if(post.Image != null && post.Image.Length > 0)
-        {
-            // save the image to wwwroot/images and get the URL
-            
-            var rootFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            if (post.Image.ContentType.Contains("image"))
-            {
-                string rootFolderPathImages = Path.Combine(rootFolderPath, "images/posts");
-                Directory.CreateDirectory(rootFolderPathImages);
+        
 
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(post.Image.FileName);
-                var filePath = Path.Combine(rootFolderPathImages, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await post.Image.CopyToAsync(stream);
-                }
-
-                // set the image URL to be used in the post
-                newPost.ImageUrl = "/images/posts/" + fileName;
-            }
-        }
-
-        // Save the new post to the database
-        await _context.Posts.AddAsync(newPost);
-        await _context.SaveChangesAsync();
+        
 
         // Find and store hashtags in the database
         var postHastags = HashtagHelper.ExtractHashtags(post.Content);
@@ -113,26 +80,7 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        // Check if the like already exists for the given post and user
-        var existingLike = await _context.Likes
-                                        .Where(l => l.PostId == model.PostId && l.UserId == loggedInUserId)
-                                        .FirstOrDefaultAsync();
-        if (existingLike != null)
-        {
-            // If the like already exists, remove it (unlike)
-            _context.Likes.Remove(existingLike);
-        }
-        else
-        {
-            // If the like does not exist, add it (like)
-            var newLike = new Like
-            {
-                PostId = model.PostId,
-                UserId = loggedInUserId
-            };
-            await _context.Likes.AddAsync(newLike);
-        }
-        await _context.SaveChangesAsync();
+        
         return RedirectToAction(nameof(Index));
     }
 
@@ -141,26 +89,7 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        // Check if the like already exists for the given post and user
-        var existingFavourite = await _context.Favourites
-                                        .Where(l => l.PostId == model.PostId && l.UserId == loggedInUserId)
-                                        .FirstOrDefaultAsync();
-        if (existingFavourite != null)
-        {
-            // If the like already exists, remove it (unlike)
-            _context.Favourites.Remove(existingFavourite);
-        }
-        else
-        {
-            // If the like does not exist, add it (like)
-            var newFavourite = new Favourite
-            {
-                PostId = model.PostId,
-                UserId = loggedInUserId
-            };
-            await _context.Favourites.AddAsync(newFavourite);
-        }
-        await _context.SaveChangesAsync();
+        
         return RedirectToAction(nameof(Index));
     }
 
@@ -169,16 +98,7 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        // Check if the like already exists for the given post and user
-        var post = await _context.Posts
-                                        .FirstOrDefaultAsync(l => l.Id == model.PostId && l.UserId == loggedInUserId);
-        if (post != null)
-        {
-            // toggle post
-            post.isPrivate = !post.isPrivate;
-            _context.Posts.Update(post);
-            await _context.SaveChangesAsync();
-        }
+        
         
         return RedirectToAction(nameof(Index));
     }
@@ -188,17 +108,7 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        // Create a new comment entity and save it to the database
-        var newComment = new Comment
-        {
-            Content = model.Content,
-            UserId = loggedInUserId,
-            PostId = model.PostId,
-            DateCreated = DateTime.UtcNow,
-            DateUpdated = DateTime.UtcNow
-        };
-        await _context.Comments.AddAsync(newComment);
-        await _context.SaveChangesAsync();
+        
         return RedirectToAction(nameof(Index));
     }
 
@@ -207,15 +117,7 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        // Create a new comment entity and save it to the database
-        var newReport = new Report
-        {
-            UserId = loggedInUserId,
-            PostId = model.PostId,
-            DateCreated = DateTime.UtcNow
-        };
-        await _context.Reports.AddAsync(newReport);
-        await _context.SaveChangesAsync();
+       
         return RedirectToAction(nameof(Index));
     }
 
