@@ -34,7 +34,7 @@ namespace CircleApp.Data.Services
                         await file.CopyToAsync(stream);
                     }
 
-                    return $"/{filePathUpload}/{fileName}";
+                    return $"{filePathUpload}\\{fileName}";
                 }
             }
 
