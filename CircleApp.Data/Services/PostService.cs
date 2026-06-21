@@ -25,32 +25,8 @@ namespace CircleApp.Data.Services
             return posts;
         }
 
-        public async Task<Post> CreatePostAsync(Post post, IFormFile Image)
+        public async Task<Post> CreatePostAsync(Post post)
         {
-            // check if an image was uploaded
-            if (Image != null && Image.Length > 0)
-            {
-                // save the image to wwwroot/images and get the URL
-
-                var rootFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                if (Image.ContentType.Contains("image"))
-                {
-                    string rootFolderPathImages = Path.Combine(rootFolderPath, "images/posts");
-                    Directory.CreateDirectory(rootFolderPathImages);
-
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(Image.FileName);
-                    var filePath = Path.Combine(rootFolderPathImages, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await Image.CopyToAsync(stream);
-                    }
-
-                    // set the image URL to be used in the post
-                    post.ImageUrl = "/images/posts/" + fileName;
-                }
-            }
-
             // Save the new post to the database
             await _context.Posts.AddAsync(post);
             await _context.SaveChangesAsync();

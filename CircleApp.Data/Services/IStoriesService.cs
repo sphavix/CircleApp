@@ -11,6 +11,6 @@ namespace CircleApp.Data.Services
     public interface IStoriesService
     {
         Task<List<Story>> GetStoriesAsync();
-        Task<Story> CreateStoryAsync(Story story, IFormFile Image);
+        Task<Story> CreateStoryAsync(Story story);
     }
 }

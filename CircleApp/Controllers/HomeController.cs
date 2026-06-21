@@ -6,23 +6,19 @@ using CircleApp.Data.Persistence.Entities;
 using CircleApp.Models;
 using CircleApp.Data.Helpers;
 using CircleApp.Data.Services;
+using CircleApp.Data.Helpers.Enums;
 
 namespace CircleApp.Controllers;
 
-public class HomeController : Controller
+public class HomeController(ILogger<HomeController> logger,
+                      IPostsService postsService,
+                      IHashtagsService hashtagService,
+                      IFilesService filesService) : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-    private readonly IPostsService _postService;
-    private readonly IHashtagsService _hashtagService;
-
-    public HomeController(ILogger<HomeController> logger,
-                          IPostsService postsService,
-                          IHashtagsService hashtagService)
-    {
-        _logger = logger;
-        _postService = postsService;
-        _hashtagService = hashtagService;
-    }
+    private readonly ILogger<HomeController> _logger = logger;
+    private readonly IPostsService _postService = postsService;
+    private readonly IHashtagsService _hashtagService = hashtagService;
+    private readonly IFilesService _filesService = filesService;
 
     public async Task<IActionResult> Index()
     {
@@ -37,6 +33,10 @@ public class HomeController : Controller
     {
         // Get the current user (for simplicity, we assume a user with ID 1)
         int loggedInUserId = 1;
+
+        // Upload the image 
+        var imageUploadPath = await _filesService.UploadImageAsync(post.Image, ImageFileType.PostImage);
+
         var newPost = new Post
         {
             Content = post.Content,
@@ -44,10 +44,10 @@ public class HomeController : Controller
             DateCreated = DateTime.UtcNow,
             DateUpdated = DateTime.UtcNow,
             NumOfReports = 0,
-            ImageUrl = ""
+            ImageUrl = imageUploadPath
         };
 
-        await _postService.CreatePostAsync(newPost, post.Image);
+        await _postService.CreatePostAsync(newPost);
 
         // Find and store hashtags in the database
         await _hashtagService.CreateHashtagForNewPostAsync(post.Content);

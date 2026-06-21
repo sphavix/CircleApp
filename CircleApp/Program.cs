@@ -14,6 +14,7 @@ builder.Services.AddDbContext<CircleAppDbContext>(options =>
 builder.Services.AddScoped<IPostsService, PostService>();
 builder.Services.AddScoped<IHashtagsService, HashtagsService>();
 builder.Services.AddScoped<IStoriesService, StoriesService>();
+builder.Services.AddScoped<IFilesService, FilesService>();
 
 var app = builder.Build();
 
