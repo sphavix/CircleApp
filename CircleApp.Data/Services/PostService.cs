@@ -28,15 +28,18 @@ namespace CircleApp.Data.Services
         public async Task<List<Post>> GetFavoritedPostsAsync(int userId)
         {
             var favoritedPosts = await _context.Favourites
-                .Include(f => f.Post.Reports)
                 .Where(f => f.UserId == userId
-                && !f.Post.isDeleted
-                && f.Post.Reports.Count < 5)
+                    && !f.Post.isDeleted
+                    && f.Post.Reports.Count < 5)
                 .Include(f => f.Post)
+                    .ThenInclude(p => p.Reports)
+                .Include(f => f.Post)
+                    .ThenInclude(p => p.Comments)
+                        .ThenInclude(c => c.User)
+                .Include(f => f.Post)
+                    .ThenInclude(p => p.Likes)
                 .Select(f => f.Post)
-                .Include(u => u.User)
-                .Include(p => p.Likes)
-                .Include(f => f.Comments).ThenInclude(c => c.User)
+                .OrderByDescending(n => n.DateCreated)
                 .ToListAsync();
             return favoritedPosts;
         }
@@ -126,7 +129,8 @@ namespace CircleApp.Data.Services
                 var newFavourite = new Favourite
                 {
                     PostId = postId,
-                    UserId = userId
+                    UserId = userId,
+                    DateCreated = DateTime.UtcNow
                 };
                 await _context.Favourites.AddAsync(newFavourite);
             }

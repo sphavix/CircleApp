@@ -108,7 +108,7 @@
         <div class="flex items-center gap-2">
             <form asp-controller="Home" asp-action="TogglePostFavourite">
                 <input type="hidden" name="postId" value="@Model.Id" />
-                <button type="submit" class="button-icon ml-auto @(isFavourited ? "text-gray-500 bg-gray-100" : "")">
+                <button type="submit" class="button-icon ml-auto @(isFavourited ? "text-gray-500 bt-orange-100" : "")">
                     <ion-icon class="text-lg" name="@(isFavourited ? "bookmark" : "bookmark-outline")"></ion-icon>
                 </button>
             </form>
