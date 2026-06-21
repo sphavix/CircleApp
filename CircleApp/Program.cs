@@ -12,6 +12,7 @@ var dbConnection = builder.Configuration.GetConnectionString("DefaultConnection"
 builder.Services.AddDbContext<CircleAppDbContext>(options =>
     options.UseSqlServer(dbConnection));
 builder.Services.AddScoped<IPostsService, PostService>();
+builder.Services.AddScoped<IHashtagsService, HashtagsService>();
 
 var app = builder.Build();
 

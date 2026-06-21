@@ -58,7 +58,7 @@ namespace CircleApp.Data.Services
             return post;
         }
 
-        public async Task DeletePostAsync(int postId)
+        public async Task<Post> DeletePostAsync(int postId)
         {
             var post = await _context.Posts.FirstOrDefaultAsync(x => x.Id == postId);
             if (post != null)
@@ -67,6 +67,7 @@ namespace CircleApp.Data.Services
                 _context.Posts.Update(post);
                 await _context.SaveChangesAsync();
             }
+            return post;
         }
 
         public async Task<Post> GetPostByIdAsync(int postId)
