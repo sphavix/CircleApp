@@ -9,10 +9,10 @@ namespace CircleApp.Data.Services
         {
             string filePathUpload = imageFileType switch
             {
-                ImageFileType.PostImage => "/images/posts",
-                ImageFileType.StoryImage => "/images/stories",
-                ImageFileType.ProfileImage => "/images/profile-images",
-                ImageFileType.CoverImage => "/images/cover-images",
+                ImageFileType.PostImage => Path.Combine("images", "posts"),
+                ImageFileType.StoryImage => Path.Combine("images", "stories"),
+                ImageFileType.ProfileImage => Path.Combine("images", "profileImages"),
+                ImageFileType.CoverImage => Path.Combine("images", "coverImages"),
                 _ => throw new ArgumentOutOfRangeException(nameof(imageFileType), $"Not expected image file type value: {imageFileType}"),
             };
 
