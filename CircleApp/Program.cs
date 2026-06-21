@@ -13,6 +13,7 @@ builder.Services.AddDbContext<CircleAppDbContext>(options =>
     options.UseSqlServer(dbConnection));
 builder.Services.AddScoped<IPostsService, PostService>();
 builder.Services.AddScoped<IHashtagsService, HashtagsService>();
+builder.Services.AddScoped<IStoriesService, StoriesService>();
 
 var app = builder.Build();
 

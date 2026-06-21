@@ -1,21 +1,19 @@
 ﻿using CircleApp.Data.Persistence.Entities;
+using CircleApp.Data.Services;
 using CircleApp.Models;
-using CircleApp.Persistence;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 namespace CircleApp.Controllers
 {
     public class StoriesController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly CircleAppDbContext _context;
+        private readonly IStoriesService _storiesService;
 
-        public StoriesController(ILogger<HomeController> logger, CircleAppDbContext context)
+        public StoriesController(ILogger<HomeController> logger, IStoriesService storiesService)
         {
             _logger = logger;
-            _context = context;
+            _storiesService = storiesService;
         }
 
         [HttpPost]
@@ -31,30 +29,7 @@ namespace CircleApp.Controllers
             };
 
             // create a new post for the story
-            if (model.Image != null && model.Image.Length > 0)
-            {
-                // save the image to wwwroot/images and get the URL
-
-                var rootFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                if (model.Image.ContentType.Contains("image"))
-                {
-                    string rootFolderPathImages = Path.Combine(rootFolderPath, "images/stories");
-                    Directory.CreateDirectory(rootFolderPathImages);
-
-                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Image.FileName);
-                    var filePath = Path.Combine(rootFolderPathImages, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await model.Image.CopyToAsync(stream);
-                    }
-
-                    // set the image URL to be used in the post
-                    newStory.ImageUrl = "/images/stories/" + fileName;
-                }
-            }
-            await _context.Stories.AddAsync(newStory);
-            await _context.SaveChangesAsync();
+            await _storiesService.CreateStoryAsync(newStory, model.Image);
 
             return RedirectToAction("Index", "Home");
         }
