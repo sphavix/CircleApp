@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using CircleApp.Data.Persistence.Entities;
 using CircleApp.Models;
 using CircleApp.Data.Helpers;
+using CircleApp.Data.Services;
 
 namespace CircleApp.Controllers;
 
@@ -12,17 +13,23 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly CircleAppDbContext _context;
+    private readonly IPostsService _postService;
 
-    public HomeController(ILogger<HomeController> logger, CircleAppDbContext context)
+    public HomeController(ILogger<HomeController> logger,
+                          CircleAppDbContext context,
+                          IPostsService postsService)
     {
         _logger = logger;
         _context = context;
+        _postService = postsService;
     }
 
     public async Task<IActionResult> Index()
     {
-        
-        return View();
+        int loggedInUserId = 1;
+        var posts = await _postService.GetPostsForUserAsync(loggedInUserId);
+
+        return View(posts);
     }
 
     [HttpPost]
@@ -40,9 +47,7 @@ public class HomeController : Controller
             ImageUrl = ""
         };
 
-        
-
-        
+        await _postService.CreatePostAsync(newPost, post.Image);
 
         // Find and store hashtags in the database
         var postHastags = HashtagHelper.ExtractHashtags(post.Content);
@@ -80,7 +85,8 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        
+        await _postService.TogglePostLikeAsync(model.PostId, loggedInUserId);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -89,7 +95,8 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        
+        await _postService.TogglePostFavouriteAsync(model.PostId, loggedInUserId);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -98,8 +105,8 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        
-        
+        await _postService.ToggleVisibilityAsync(model.PostId, loggedInUserId);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -108,7 +115,17 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-        
+        var comment = new Comment
+        {
+            PostId = model.PostId,
+            UserId = loggedInUserId,
+            Content = model.Content,
+            DateCreated = DateTime.UtcNow,
+            DateUpdated = DateTime.UtcNow
+        };
+
+        await _postService.AddPostCommentAsync(comment);
+
         return RedirectToAction(nameof(Index));
     }
 
@@ -117,25 +134,15 @@ public class HomeController : Controller
     {
         int loggedInUserId = 1; // For simplicity, we assume a user with ID 1
 
-       
+        await _postService.ReportPostAsync(model.PostId, loggedInUserId);
+
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
     public async Task<IActionResult> RemovePostComment(RemoveCommentViewModel model)
     {
-        // Find the comment to be removed
-        var commentToRemove = await _context.Comments
-                                            .FirstOrDefaultAsync(c => c.Id == model.CommentId);
-        if (commentToRemove != null)
-        {
-
-            _context.Comments.Remove(commentToRemove);
-            await _context.SaveChangesAsync();
-
-
-           
-        }
+        await _postService.RemovePostCommentAsync(model.CommentId);
 
         return RedirectToAction(nameof(Index));
     }
@@ -143,32 +150,23 @@ public class HomeController : Controller
     [HttpPost]
     public async Task<IActionResult> DeletePost(DeletePostViewModel model)
     {
-        // Find the comment to be removed
-        var post = await _context.Posts.FirstOrDefaultAsync(c => c.Id == model.PostId);
+        await _postService.DeletePostAsync(model.PostId);
 
-        if (post != null)
-        {
-            post.isDeleted = true;
-            _context.Posts.Update(post);
-            await _context.SaveChangesAsync();
+        // update hashtags in the database
+        
+        //var hashTag = HashtagHelper.ExtractHashtags(model.Content);
+        //foreach (var hashtag in hashTag)
+        //{
+        //    var existingHashtag = await _context.Hashtags.FirstOrDefaultAsync(h => h.Name == hashtag);
+        //    if (existingHashtag != null)
+        //    {
+        //        existingHashtag.Count--;
+        //        existingHashtag.DateUpdated = DateTime.UtcNow;
 
-            // update hashtags in the database
-            var hashTag = HashtagHelper.ExtractHashtags(post.Content);
-            foreach(var hashtag in hashTag)
-            {
-                var existingHashtag = await _context.Hashtags.FirstOrDefaultAsync(h => h.Name == hashtag);
-                if (existingHashtag != null)
-                {
-                    existingHashtag.Count--;
-                    existingHashtag.DateUpdated = DateTime.UtcNow;
-
-                    _context.Hashtags.Update(existingHashtag);
-                    await _context.SaveChangesAsync();
-                }
-            }
-        }
+        //        _context.Hashtags.Update(existingHashtag);
+        //        await _context.SaveChangesAsync();
+        //    }
+        //}
         return RedirectToAction(nameof(Index));
     }
-
-
 }

@@ -1,4 +1,5 @@
 using CircleApp.Data.Helpers;
+using CircleApp.Data.Services;
 using CircleApp.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ builder.Services.AddControllersWithViews();
 var dbConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<CircleAppDbContext>(options =>
     options.UseSqlServer(dbConnection));
+builder.Services.AddScoped<IPostsService, PostService>();
 
 var app = builder.Build();
 
