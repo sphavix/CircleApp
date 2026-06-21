@@ -25,6 +25,22 @@ namespace CircleApp.Data.Services
             return posts;
         }
 
+        public async Task<List<Post>> GetFavoritedPostsAsync(int userId)
+        {
+            var favoritedPosts = await _context.Favourites
+                .Include(f => f.Post.Reports)
+                .Where(f => f.UserId == userId
+                && !f.Post.isDeleted
+                && f.Post.Reports.Count < 5)
+                .Include(f => f.Post)
+                .Select(f => f.Post)
+                .Include(u => u.User)
+                .Include(p => p.Likes)
+                .Include(f => f.Comments).ThenInclude(c => c.User)
+                .ToListAsync();
+            return favoritedPosts;
+        }
+
         public async Task<Post> CreatePostAsync(Post post)
         {
             // Save the new post to the database
